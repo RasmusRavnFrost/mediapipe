@@ -46,19 +46,21 @@ def main(argv):
   if not flags.FLAGS.clip_end_time_sec:
     raise ValueError('You must specify the clip end timestamp in seconds.')
   if flags.FLAGS.clip_start_time_sec >= flags.FLAGS.clip_end_time_sec:
-    raise ValueError(
-        'The clip start time must be greater than the clip end time.')
+    raise ValueError('The clip start time must be greater than the clip end time.')
+  output_file = flags.FLAGS.path_to_output_file or '/tmp/mediapipe/metadata.pb'
+
   metadata = tf.train.SequenceExample()
   ms.set_clip_data_path(bytes23(flags.FLAGS.path_to_input_video), metadata)
   ms.set_clip_start_timestamp(
       flags.FLAGS.clip_start_time_sec * SECONDS_TO_MICROSECONDS, metadata)
   ms.set_clip_end_timestamp(
       flags.FLAGS.clip_end_time_sec * SECONDS_TO_MICROSECONDS, metadata)
-  with open('/tmp/mediapipe/metadata.pb', 'wb') as writer:
+  with open(output_file, 'wb') as writer:
     writer.write(six.ensure_binary(metadata.SerializeToString()))
 
 
 if __name__ == '__main__':
+  flags.DEFINE_string('path_to_output_file', '', 'Path to the output file (should have .pb extension)')
   flags.DEFINE_string('path_to_input_video', '', 'Path to the input video.')
   flags.DEFINE_integer('clip_start_time_sec', 0,
                        'Clip start timestamp in seconds')

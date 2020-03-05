@@ -25,9 +25,10 @@ import sys
 
 from absl import app
 import tensorflow.compat.v1 as tf
-from tensorflow.compat.v1.python.tools import freeze_graph
+from tensorflow.python.tools import freeze_graph
 
-BASE_DIR = '/tmp/mediapipe/'
+BASE_DIR = 'tmp/mediapipe'
+
 
 
 def create_vggish_frozen_graph():
@@ -67,4 +68,4 @@ def main(argv):
 
 
 if __name__ == '__main__':
-  app.run(main)
+    app.run(main)
