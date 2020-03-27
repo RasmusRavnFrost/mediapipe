@@ -9,3 +9,4 @@ mediapipe/MediaPipe.xcodeproj
 mediapipe/MediaPipe.tulsiproj/*.tulsiconf-user
 .idea
 data
+*.pyc

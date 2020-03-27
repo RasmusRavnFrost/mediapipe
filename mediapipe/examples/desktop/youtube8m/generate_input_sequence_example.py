@@ -18,6 +18,7 @@ from __future__ import division
 from __future__ import print_function
 
 import sys
+from pathlib import Path
 
 from absl import app
 from absl import flags
@@ -30,39 +31,57 @@ SECONDS_TO_MICROSECONDS = 1000000
 
 
 def bytes23(string):
-  """Creates a bytes string in either Python 2 or  3."""
-  if sys.version_info >= (3, 0):
-    return bytes(string, 'utf8')
-  else:
-    return bytes(string)
+    """Creates a bytes string in either Python 2 or  3."""
+    if sys.version_info >= (3, 0):
+        return bytes(string, 'utf8')
+    else:
+        return bytes(string)
 
 
 def main(argv):
-  if len(argv) > 3:
-    raise app.UsageError('Too many command-line arguments.')
+    if len(argv) > 4:
+        raise app.UsageError('Too many command-line arguments.')
 
-  if not flags.FLAGS.path_to_input_video:
-    raise ValueError('You must specify the path to the input video.')
-  if not flags.FLAGS.clip_end_time_sec:
-    raise ValueError('You must specify the clip end timestamp in seconds.')
-  if flags.FLAGS.clip_start_time_sec >= flags.FLAGS.clip_end_time_sec:
-    raise ValueError('The clip start time must be greater than the clip end time.')
-  output_file = flags.FLAGS.path_to_output_file or '/tmp/mediapipe/metadata.pb'
+    if not flags.FLAGS.path_to_input_video:
+        raise ValueError('You must specify the path to the input video.')
+    if not flags.FLAGS.clip_end_time_sec:
+        raise ValueError('You must specify the clip end timestamp in seconds.')
+    if flags.FLAGS.clip_start_time_sec >= flags.FLAGS.clip_end_time_sec:
+        raise ValueError('The clip start time must be greater than the clip end time.')
+    output_file = flags.FLAGS.path_to_output_file or '/tmp/mediapipe/metadata.pb'
 
-  metadata = tf.train.SequenceExample()
-  ms.set_clip_data_path(bytes23(flags.FLAGS.path_to_input_video), metadata)
-  ms.set_clip_start_timestamp(
-      flags.FLAGS.clip_start_time_sec * SECONDS_TO_MICROSECONDS, metadata)
-  ms.set_clip_end_timestamp(
-      flags.FLAGS.clip_end_time_sec * SECONDS_TO_MICROSECONDS, metadata)
-  with open(output_file, 'wb') as writer:
-    writer.write(six.ensure_binary(metadata.SerializeToString()))
+    metadata = tf.train.SequenceExample()
+    ms.set_clip_data_path(bytes23(flags.FLAGS.path_to_input_video), metadata)
+    ms.set_clip_start_timestamp(
+        flags.FLAGS.clip_start_time_sec * SECONDS_TO_MICROSECONDS, metadata)
+    ms.set_clip_end_timestamp(
+        flags.FLAGS.clip_end_time_sec * SECONDS_TO_MICROSECONDS, metadata)
+    with open(output_file, 'wb') as writer:
+        writer.write(six.ensure_binary(metadata.SerializeToString()))
+
+
+def generate(path_to_input_video: Path, output_file: Path, clip_end_time_sec: int = None,
+             clip_start_time_sec: int = None):
+
+    clip_start_time_sec = clip_start_time_sec or 0
+    metadata = tf.train.SequenceExample()
+    ms.set_clip_data_path(bytes23(str(path_to_input_video)), metadata)
+    ms.set_clip_start_timestamp(clip_start_time_sec * SECONDS_TO_MICROSECONDS, metadata)
+    # ms.set_clip_end_timestamp(clip_end_time_sec * SECONDS_TO_MICROSECONDS, metadata)
+    # if extra_data:
+        # for key, val in extra_data.items():
+        #     ms.set["set_clip_" + "_".join(key.split(" "))](bytes23(str(val)))
+    if clip_end_time_sec:
+      ms.set_clip_end_timestamp(clip_end_time_sec * SECONDS_TO_MICROSECONDS, metadata)
+    with open(str(output_file), 'wb') as writer:
+        writer.write(six.ensure_binary(metadata.SerializeToString()))
+    return True
 
 
 if __name__ == '__main__':
-  flags.DEFINE_string('path_to_output_file', '', 'Path to the output file (should have .pb extension)')
-  flags.DEFINE_string('path_to_input_video', '', 'Path to the input video.')
-  flags.DEFINE_integer('clip_start_time_sec', 0,
-                       'Clip start timestamp in seconds')
-  flags.DEFINE_integer('clip_end_time_sec', 10, 'Clip end timestamp in seconds')
-  app.run(main)
+    flags.DEFINE_string('path_to_output_file', '', 'Path to the output file (should have .pb extension)')
+    flags.DEFINE_string('path_to_input_video', '', 'Path to the input video.')
+    flags.DEFINE_integer('clip_start_time_sec', 0,
+                         'Clip start timestamp in seconds')
+    flags.DEFINE_integer('clip_end_time_sec', 10, 'Clip end timestamp in seconds')
+    app.run(main)
