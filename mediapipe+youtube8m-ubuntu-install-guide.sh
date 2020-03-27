@@ -1,10 +1,8 @@
-# Depricarted: If you are reading this Rasmus found out that bazel/mediapipe is not need to get embedding vectors
-# for youtube8m and evaulate corresponding models
 # Mediapipe & YouTube8M install guide for ubuntu 18.04
-# Copying this script to the terminal should work but probably a good idea to take in a few step to ensure everyhing
+# Copying this script to the terminal should work, but probably a good idea to take in a few step to ensure everyhing
 # ran properly and read the comments (you might want to change some things)...
 # Asume that command python and pip refers to python v3.6 if thats is the version you want to use
-# FIRST: GOTO directory where mediapipe repository will be located.
+# FIRST: GOTO directory where mediapipe repository will be located. (for instance Home/documents/Kaspar/mediapipe
 
 # MediaPipe uses bazel to run everything, so we first install it.
 
